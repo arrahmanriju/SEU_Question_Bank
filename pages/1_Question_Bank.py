@@ -6,6 +6,13 @@ Navigation hierarchy:  Department → Course → Faculty → Questions
 
 import streamlit as st
 import importlib
+import sys
+import os
+
+# Ensure the root directory is in sys.path so we can import db_manager on Streamlit Cloud
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
 
 import db_manager
 importlib.reload(db_manager)
@@ -86,7 +93,7 @@ if is_searching:
             with st.container(border=True):
                 st.image(q["image_url"], use_container_width=True)
                 st.markdown(f"**{q['course_code']}** · {q['question_type']}")
-                st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']} · Uploaded {q['uploaded_at'][:10]}")
+                st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']} · Uploaded {str(q['uploaded_at'])[:10]}")
     
     st.stop()  # Stop rendering the rest of the page (hide drill-down)
 
@@ -218,4 +225,4 @@ elif level == 4:
             with st.container(border=True):
                 st.image(q["image_url"], use_container_width=True)
                 st.markdown(f"**{q['course_code']}** · {q['question_type']}")
-                st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']} · Uploaded {q['uploaded_at'][:10]}")
+                st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']} · Uploaded {str(q['uploaded_at'])[:10]}")

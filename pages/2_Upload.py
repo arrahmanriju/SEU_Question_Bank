@@ -6,7 +6,13 @@ import streamlit as st
 import cloudinary
 import cloudinary.uploader
 from dotenv import load_dotenv
+import sys
 import os
+
+# Ensure the root directory is in sys.path so we can import db_manager on Streamlit Cloud
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
 
 from db_manager import add_question, DEPARTMENTS, QUESTION_TYPES, init_db
 
