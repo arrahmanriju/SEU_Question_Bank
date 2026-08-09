@@ -8,6 +8,7 @@ querying, and approving question papers.
 import sqlite3
 import os
 from datetime import datetime
+import streamlit as st
 
 try:
     import psycopg2
@@ -148,6 +149,7 @@ def add_question(department: str, course_code: str, faculty_initial: str, questi
             )
             row_id = cursor.fetchone()[0]
             conn.commit()
+            st.cache_data.clear()
             return row_id
         else:
             cursor = conn.cursor()
@@ -159,11 +161,13 @@ def add_question(department: str, course_code: str, faculty_initial: str, questi
                 (department, course_code, faculty_initial, question_type, image_url, datetime.now().isoformat())
             )
             conn.commit()
+            st.cache_data.clear()
             return cursor.lastrowid
     finally:
         conn.close()
 
 
+@st.cache_data(ttl=60)
 def get_questions(
     status: str | None = None,
     department: str | None = None,
@@ -198,6 +202,7 @@ def get_questions(
     return _execute(query, tuple(params), fetchall=True)
 
 
+@st.cache_data(ttl=60)
 def search_questions(course_query: str, faculty_query: str) -> list[dict]:
     """Search approved questions by partial course code or faculty initial."""
     query = "SELECT * FROM questions WHERE status = 'Approved'"
@@ -216,6 +221,7 @@ def search_questions(course_query: str, faculty_query: str) -> list[dict]:
     return _execute(query, tuple(params), fetchall=True)
 
 
+@st.cache_data(ttl=60)
 def get_departments() -> list[dict]:
     """
     Return distinct departments that have at least one approved question,
@@ -231,6 +237,7 @@ def get_departments() -> list[dict]:
     return _execute(query, fetchall=True)
 
 
+@st.cache_data(ttl=60)
 def get_courses(department: str) -> list[dict]:
     """
     Return distinct course codes for a given department (approved only),
@@ -246,6 +253,7 @@ def get_courses(department: str) -> list[dict]:
     return _execute(query, (department,), fetchall=True)
 
 
+@st.cache_data(ttl=60)
 def get_faculty(department: str, course_code: str) -> list[dict]:
     """
     Return distinct faculty initials for a given department + course combo
@@ -264,16 +272,19 @@ def get_faculty(department: str, course_code: str) -> list[dict]:
 def approve_question(question_id: int) -> None:
     """Set a question's status to 'Approved'."""
     _execute("UPDATE questions SET status = 'Approved' WHERE id = ?;", (question_id,), commit=True)
+    st.cache_data.clear()
 
 
 def reject_question(question_id: int) -> None:
     """Delete a pending question from the database."""
     _execute("DELETE FROM questions WHERE id = ?;", (question_id,), commit=True)
+    st.cache_data.clear()
 
 
 def delete_question(question_id: int) -> None:
     """Delete any question from the database."""
     _execute("DELETE FROM questions WHERE id = ?;", (question_id,), commit=True)
+    st.cache_data.clear()
 
 
 def update_question(question_id: int, department: str, course_code: str, faculty_initial: str, question_type: str) -> None:
@@ -284,8 +295,9 @@ def update_question(question_id: int, department: str, course_code: str, faculty
         WHERE id = ?;
     """
     _execute(query, (department, course_code, faculty_initial, question_type, question_id), commit=True)
+    st.cache_data.clear()
 
-
+@st.cache_data(ttl=60)
 def count_by_status(status: str) -> int:
     """Return the count of questions with the given status."""
     conn = _get_connection()
