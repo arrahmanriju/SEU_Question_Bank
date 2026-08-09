@@ -1,0 +1,7 @@
+.env
+venv/
+question_bank.db
+__pycache__/
+*.pyc
+.streamlit/secrets.toml
+assets/*.tmp
