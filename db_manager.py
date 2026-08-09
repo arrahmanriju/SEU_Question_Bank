@@ -44,14 +44,28 @@ def _is_postgres() -> bool:
     return DATABASE_URL is not None and DATABASE_URL.startswith("postgres") and psycopg2 is not None
 
 
+@st.cache_resource(ttl=3600)
+def _get_pg_pool():
+    from psycopg2 import pool
+    return pool.SimpleConnectionPool(1, 10, DATABASE_URL)
+
 def _get_connection():
-    """Return a new database connection (Postgres or SQLite)."""
+    """Return a database connection (Postgres from pool, or new SQLite)."""
     if _is_postgres():
-        return psycopg2.connect(DATABASE_URL)
+        pool = _get_pg_pool()
+        return pool.getconn()
     else:
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         return conn
+
+def _release_connection(conn):
+    """Release or close the database connection."""
+    if _is_postgres():
+        pool = _get_pg_pool()
+        pool.putconn(conn)
+    else:
+        conn.close()
 
 
 def _execute(query: str, params: tuple = (), fetchall=False, fetchone=False, commit=False):
@@ -88,7 +102,7 @@ def _execute(query: str, params: tuple = (), fetchall=False, fetchone=False, com
 
         return result
     finally:
-        conn.close()
+        _release_connection(conn)
 
 
 def init_db() -> None:
@@ -128,7 +142,7 @@ def init_db() -> None:
             )
         conn.commit()
     finally:
-        conn.close()
+        _release_connection(conn)
 
 
 def add_question(department: str, course_code: str, faculty_initial: str, question_type: str, image_url: str) -> int:
@@ -164,7 +178,7 @@ def add_question(department: str, course_code: str, faculty_initial: str, questi
             st.cache_data.clear()
             return cursor.lastrowid
     finally:
-        conn.close()
+        _release_connection(conn)
 
 
 @st.cache_data(ttl=60, show_spinner=False)
@@ -310,4 +324,4 @@ def count_by_status(status: str) -> int:
         result = cursor.fetchone()
         return result[0] if result else 0
     finally:
-        conn.close()
+        _release_connection(conn)
