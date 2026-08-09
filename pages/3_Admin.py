@@ -4,7 +4,6 @@ Requires login with admin credentials.
 """
 
 import streamlit as st
-import importlib
 from dotenv import load_dotenv
 import sys
 import os
@@ -14,8 +13,6 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
-import db_manager
-importlib.reload(db_manager)
 from db_manager import (
     get_questions, 
     approve_question, 

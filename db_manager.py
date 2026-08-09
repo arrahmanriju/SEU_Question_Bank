@@ -105,6 +105,7 @@ def _execute(query: str, params: tuple = (), fetchall=False, fetchone=False, com
         _release_connection(conn)
 
 
+@st.cache_resource(show_spinner=False)
 def init_db() -> None:
     """Create the questions table if it does not already exist."""
     conn = _get_connection()
