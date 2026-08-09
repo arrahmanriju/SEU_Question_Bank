@@ -115,19 +115,13 @@ st.markdown(" / ".join(f"**{p}**" for p in breadcrumb_parts))
 if level > 1:
     cols = st.columns(4)
     with cols[0]:
-        if st.button("← Home", key="bc_home"):
-            go_to_departments()
-            st.rerun()
+        st.button("← Home", key="bc_home", on_click=go_to_departments)
     if level > 2 and dept:
         with cols[1]:
-            if st.button(f"← {dept}", key="bc_dept"):
-                go_to_courses(dept)
-                st.rerun()
+            st.button(f"← {dept}", key="bc_dept", on_click=go_to_courses, args=(dept,))
     if level > 3 and course:
         with cols[2]:
-            if st.button(f"← {course}", key="bc_course"):
-                go_to_faculty(course)
-                st.rerun()
+            st.button(f"← {course}", key="bc_course", on_click=go_to_faculty, args=(course,))
 
 st.divider()
 
@@ -146,13 +140,13 @@ if level == 1:
         cols = st.columns(3)
         for idx, d in enumerate(departments):
             with cols[idx % 3]:
-                if st.button(
+                st.button(
                     f"📁 {d['department']}  ({d['count']})",
                     key=f"dept_{d['department']}",
                     use_container_width=True,
-                ):
-                    go_to_courses(d["department"])
-                    st.rerun()
+                    on_click=go_to_courses,
+                    args=(d["department"],)
+                )
 
 # ═════════════════════════════════════════════════════════════════════════════
 # LEVEL 2 — Courses
@@ -169,13 +163,13 @@ elif level == 2:
         cols = st.columns(3)
         for idx, c in enumerate(courses):
             with cols[idx % 3]:
-                if st.button(
+                st.button(
                     f"📂 {c['course_code']}  ({c['count']})",
                     key=f"course_{c['course_code']}",
                     use_container_width=True,
-                ):
-                    go_to_faculty(c["course_code"])
-                    st.rerun()
+                    on_click=go_to_faculty,
+                    args=(c["course_code"],)
+                )
 
 # ═════════════════════════════════════════════════════════════════════════════
 # LEVEL 3 — Faculty
@@ -192,13 +186,13 @@ elif level == 3:
         cols = st.columns(3)
         for idx, f in enumerate(faculty_list):
             with cols[idx % 3]:
-                if st.button(
+                st.button(
                     f"👤 {f['faculty_initial']}  ({f['count']})",
                     key=f"faculty_{f['faculty_initial']}",
                     use_container_width=True,
-                ):
-                    go_to_questions(f["faculty_initial"])
-                    st.rerun()
+                    on_click=go_to_questions,
+                    args=(f["faculty_initial"],)
+                )
 
 # ═════════════════════════════════════════════════════════════════════════════
 # LEVEL 4 — Questions

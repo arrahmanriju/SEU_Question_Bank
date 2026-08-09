@@ -19,6 +19,14 @@ except ImportError:
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "question_bank.db")
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
+def get_optimized_image_url(url: str, width: int = 800) -> str:
+    """Insert Cloudinary transformations for auto-format, auto-quality, and resizing."""
+    if "res.cloudinary.com" in url and "/upload/" in url:
+        parts = url.split("/upload/")
+        return f"{parts[0]}/upload/w_{width},q_auto,f_auto/{parts[1]}"
+    return url
+
+
 
 # ── Predefined lists ───────────
 
