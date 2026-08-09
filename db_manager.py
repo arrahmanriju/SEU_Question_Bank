@@ -167,7 +167,7 @@ def add_question(department: str, course_code: str, faculty_initial: str, questi
         conn.close()
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=60, show_spinner=False)
 def get_questions(
     status: str | None = None,
     department: str | None = None,
@@ -202,7 +202,7 @@ def get_questions(
     return _execute(query, tuple(params), fetchall=True)
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=60, show_spinner=False)
 def search_questions(course_query: str, faculty_query: str) -> list[dict]:
     """Search approved questions by partial course code or faculty initial."""
     query = "SELECT * FROM questions WHERE status = 'Approved'"
@@ -221,7 +221,7 @@ def search_questions(course_query: str, faculty_query: str) -> list[dict]:
     return _execute(query, tuple(params), fetchall=True)
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=60, show_spinner=False)
 def get_departments() -> list[dict]:
     """
     Return distinct departments that have at least one approved question,
@@ -237,7 +237,7 @@ def get_departments() -> list[dict]:
     return _execute(query, fetchall=True)
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=60, show_spinner=False)
 def get_courses(department: str) -> list[dict]:
     """
     Return distinct course codes for a given department (approved only),
@@ -253,7 +253,7 @@ def get_courses(department: str) -> list[dict]:
     return _execute(query, (department,), fetchall=True)
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=60, show_spinner=False)
 def get_faculty(department: str, course_code: str) -> list[dict]:
     """
     Return distinct faculty initials for a given department + course combo
