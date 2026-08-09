@@ -32,7 +32,7 @@ A comprehensive, centralized repository for academic question papers, built with
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/arrahmanriju/SEU_Question_Bank.git
    cd QuestionBank
    ```
 
