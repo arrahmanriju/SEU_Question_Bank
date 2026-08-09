@@ -30,7 +30,7 @@ load_dotenv(override=True)
 
 # ── Page config ─────────────────────────────────────────────────────────────
 
-st.set_page_config(page_title="Admin Panel", page_icon="🔒", layout="centered")
+st.set_page_config(page_title="Admin Panel", page_icon="🔒", layout="centered", initial_sidebar_state="expanded")
 
 # ── Admin credentials from .env ─────────────────────────────────────────────
 

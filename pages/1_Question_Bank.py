@@ -26,7 +26,7 @@ init_db()
 
 # ── Page config ─────────────────────────────────────────────────────────────
 
-st.set_page_config(page_title="Question Bank", page_icon="📚", layout="centered")
+st.set_page_config(page_title="Question Bank", page_icon="📚", layout="centered", initial_sidebar_state="expanded")
 
 # ── Session state defaults ──────────────────────────────────────────────────
 
@@ -62,6 +62,10 @@ def go_to_questions(faculty: str):
     st.session_state.qb_level = 4
     st.session_state.qb_faculty = faculty
 
+@st.dialog("🔍 Zoomed Question", width="large")
+def zoom_question(image_url):
+    st.image(image_url, use_container_width=True)
+
 # ── Header ──────────────────────────────────────────────────────────────────
 
 st.title("Question Bank")
@@ -90,6 +94,8 @@ if is_searching:
                 st.image(q["image_url"], use_container_width=True)
                 st.markdown(f"**{q['course_code']}** · {q['question_type']}")
                 st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']} · Uploaded {str(q['uploaded_at'])[:10]}")
+                if st.button("🔍 Zoom Question", key=f"zoom_search_{q['id']}"):
+                    zoom_question(q["image_url"])
     
     st.stop()  # Stop rendering the rest of the page (hide drill-down)
 
@@ -216,3 +222,5 @@ elif level == 4:
                 st.image(q["image_url"], use_container_width=True)
                 st.markdown(f"**{q['course_code']}** · {q['question_type']}")
                 st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']} · Uploaded {str(q['uploaded_at'])[:10]}")
+                if st.button("🔍 Zoom Question", key=f"zoom_q_{q['id']}"):
+                    zoom_question(q["image_url"])

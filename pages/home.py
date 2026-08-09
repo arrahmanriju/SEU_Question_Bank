@@ -21,6 +21,7 @@ st.set_page_config(
     page_title="Southeast University Question Bank",
     page_icon="🎓",
     layout="centered",
+    initial_sidebar_state="expanded",
 )
 
 # ── Initialise database on first run ────────────────────────────────────────

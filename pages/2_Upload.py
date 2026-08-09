@@ -30,7 +30,7 @@ cloudinary.config(
 
 # ── Page config ─────────────────────────────────────────────────────────────
 
-st.set_page_config(page_title="Upload Question", page_icon="📤", layout="centered")
+st.set_page_config(page_title="Upload Question", page_icon="📤", layout="centered", initial_sidebar_state="expanded")
 
 # ── Header ──────────────────────────────────────────────────────────────────
 
