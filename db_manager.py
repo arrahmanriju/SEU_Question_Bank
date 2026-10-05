@@ -7,6 +7,7 @@ querying, and approving question papers.
 
 import sqlite3
 import os
+import re
 from datetime import datetime
 import streamlit as st
 
@@ -30,6 +31,16 @@ def get_optimized_image_url(url: str, width: int = 800) -> str:
 def is_pdf(q: dict) -> bool:
     """True if a question row is a PDF (new rows use file_type; fall back to the URL)."""
     return q.get("file_type") == "pdf" or q["image_url"].lower().split("?")[0].endswith(".pdf")
+
+
+def get_download_url(q: dict) -> str:
+    """Original file URL that makes the browser download it (named e.g. CSE101_CT_ABC)."""
+    url = q["image_url"]
+    if "res.cloudinary.com" not in url or "/upload/" not in url:
+        return url
+    name = re.sub(r"[^A-Za-z0-9_-]", "", f"{q['course_code']}_{q['question_type']}_{q['faculty_initial']}")
+    head, tail = url.split("/upload/", 1)
+    return f"{head}/upload/fl_attachment:{name}/{tail}" if name else f"{head}/upload/fl_attachment/{tail}"
 
 
 def get_preview_url(q: dict, width: int = 800) -> str:
