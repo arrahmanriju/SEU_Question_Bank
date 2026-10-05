@@ -1,6 +1,7 @@
 # SEU Question Bank 📚
 
 A comprehensive, centralized repository for academic question papers, built with **Streamlit**. This platform allows students and faculty to easily upload, browse, search, and manage past question papers across various departments and courses.
+
 🔗 **Live demo:** https://seuquestionbank-5jp88dl7ukwxlgp7juw7v9.streamlit.app/
 
 ## Features ✨
