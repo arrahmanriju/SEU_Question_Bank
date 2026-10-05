@@ -27,6 +27,22 @@ def get_optimized_image_url(url: str, width: int = 800) -> str:
     return url
 
 
+def is_pdf(q: dict) -> bool:
+    """True if a question row is a PDF (new rows use file_type; fall back to the URL)."""
+    return q.get("file_type") == "pdf" or q["image_url"].lower().split("?")[0].endswith(".pdf")
+
+
+def get_preview_url(q: dict, width: int = 800) -> str:
+    """Image URL to display for a question; for PDFs this is a render of page 1."""
+    url = q["image_url"]
+    if is_pdf(q) and "res.cloudinary.com" in url and "/upload/" in url:
+        head, tail = url.split("/upload/", 1)
+        if tail.lower().endswith(".pdf"):
+            tail = tail[:-4]
+        return f"{head}/upload/pg_1,w_{width},q_auto,f_jpg/{tail}.jpg"
+    return url
+
+
 
 # ── Predefined lists ───────────
 
@@ -150,14 +166,30 @@ def init_db() -> None:
                 """
             )
         conn.commit()
+
+        # Migration: add file_type without touching existing rows (they default to 'image').
+        if _is_postgres():
+            cursor.execute("ALTER TABLE questions ADD COLUMN IF NOT EXISTS file_type TEXT NOT NULL DEFAULT 'image';")
+        else:
+            cursor.execute("PRAGMA table_info(questions);")
+            if "file_type" not in [row[1] for row in cursor.fetchall()]:
+                cursor.execute("ALTER TABLE questions ADD COLUMN file_type TEXT NOT NULL DEFAULT 'image';")
+        conn.commit()
     finally:
         _release_connection(conn)
 
 
-def add_question(department: str, course_code: str, faculty_initial: str, question_type: str, image_url: str) -> int:
+def add_question(
+    department: str,
+    course_code: str,
+    faculty_initial: str,
+    question_type: str,
+    image_url: str,
+    file_type: str = "image",
+) -> int:
     """
     Insert a new question with status 'Pending'.
-    Returns the new row id.
+    file_type is 'image' or 'pdf'. Returns the new row id.
     """
     conn = _get_connection()
     try:
@@ -165,10 +197,10 @@ def add_question(department: str, course_code: str, faculty_initial: str, questi
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO questions (department, course_code, faculty_initial, question_type, image_url, status, uploaded_at)
-                VALUES (%s, %s, %s, %s, %s, 'Pending', %s) RETURNING id;
+                INSERT INTO questions (department, course_code, faculty_initial, question_type, image_url, file_type, status, uploaded_at)
+                VALUES (%s, %s, %s, %s, %s, %s, 'Pending', %s) RETURNING id;
                 """,
-                (department, course_code, faculty_initial, question_type, image_url, datetime.now().isoformat())
+                (department, course_code, faculty_initial, question_type, image_url, file_type, datetime.now().isoformat())
             )
             row_id = cursor.fetchone()[0]
             conn.commit()
@@ -178,10 +210,10 @@ def add_question(department: str, course_code: str, faculty_initial: str, questi
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO questions (department, course_code, faculty_initial, question_type, image_url, status, uploaded_at)
-                VALUES (?, ?, ?, ?, ?, 'Pending', ?);
+                INSERT INTO questions (department, course_code, faculty_initial, question_type, image_url, file_type, status, uploaded_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'Pending', ?);
                 """,
-                (department, course_code, faculty_initial, question_type, image_url, datetime.now().isoformat())
+                (department, course_code, faculty_initial, question_type, image_url, file_type, datetime.now().isoformat())
             )
             conn.commit()
             st.cache_data.clear()

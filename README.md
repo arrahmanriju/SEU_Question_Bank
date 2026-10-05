@@ -5,7 +5,7 @@ A comprehensive, centralized repository for academic question papers, built with
 ## Features ✨
 
 - **Browse & Search:** Effortlessly search for question papers by Department, Course, Semester, and Question Type (CT, Mid, Final, Others).
-- **Upload Papers:** Contribute to the community by uploading new question papers (supports image uploads via Cloudinary).
+- **Upload Papers:** Contribute to the community by uploading new question papers (supports JPG/PNG images and PDFs via Cloudinary).
 - **Admin Dashboard:** Built-in admin panel to review, approve, or reject uploaded question papers to ensure quality.
 - **Database Support:** Seamlessly handles data storage using either **SQLite** (for local development) or **PostgreSQL** (for production environments).
 - **Interactive UI:** A clean, responsive interface powered by Streamlit.
@@ -26,6 +26,7 @@ A comprehensive, centralized repository for academic question papers, built with
   - `1_Question_Bank.py`: Browse and search existing question papers.
   - `2_Upload.py`: Interface for users to upload new question papers.
   - `3_Admin.py`: Admin dashboard for managing uploads.
+- `ui_helpers.py`: Shared rendering for image and PDF papers.
 - `requirements.txt`: Python dependencies required to run the project.
 
 ## Installation & Setup 🚀

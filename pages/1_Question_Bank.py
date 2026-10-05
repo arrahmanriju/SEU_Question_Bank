@@ -21,6 +21,7 @@ from db_manager import (
     search_questions,
     init_db,
 )
+from ui_helpers import show_paper, type_label
 
 init_db()
 
@@ -63,8 +64,8 @@ def go_to_questions(faculty: str):
     st.session_state.qb_faculty = faculty
 
 @st.dialog("🔍 Zoomed Question", width="large")
-def zoom_question(image_url):
-    st.image(image_url, use_container_width=True)
+def zoom_question(q):
+    show_paper(q, width=1600)
 
 # ── Header ──────────────────────────────────────────────────────────────────
 
@@ -91,11 +92,11 @@ if is_searching:
     else:
         for q in results:
             with st.container(border=True):
-                st.image(q["image_url"], use_container_width=True)
-                st.markdown(f"**{q['course_code']}** · {q['question_type']}")
+                show_paper(q)
+                st.markdown(f"**{q['course_code']}** · {type_label(q)}")
                 st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']} · Uploaded {str(q['uploaded_at'])[:10]}")
                 if st.button("🔍 Zoom Question", key=f"zoom_search_{q['id']}"):
-                    zoom_question(q["image_url"])
+                    zoom_question(q)
     
     st.stop()  # Stop rendering the rest of the page (hide drill-down)
 
@@ -219,8 +220,8 @@ elif level == 4:
 
         for q in questions:
             with st.container(border=True):
-                st.image(q["image_url"], use_container_width=True)
-                st.markdown(f"**{q['course_code']}** · {q['question_type']}")
+                show_paper(q)
+                st.markdown(f"**{q['course_code']}** · {type_label(q)}")
                 st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']} · Uploaded {str(q['uploaded_at'])[:10]}")
                 if st.button("🔍 Zoom Question", key=f"zoom_q_{q['id']}"):
-                    zoom_question(q["image_url"])
+                    zoom_question(q)

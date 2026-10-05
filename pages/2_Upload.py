@@ -19,6 +19,8 @@ from db_manager import add_question, DEPARTMENTS, QUESTION_TYPES, init_db
 init_db()
 load_dotenv(override=True)
 
+MAX_FILE_MB = 10
+
 # ── Cloudinary configuration ────────────────────────────────────────────────
 
 cloudinary.config(
@@ -59,11 +61,11 @@ with st.form("upload_form", clear_on_submit=True):
         question_type = st.selectbox("Question Type", options=QUESTION_TYPES)
         faculty_initial = st.text_input("Faculty Initial (e.g., ABC)")
 
-    st.subheader("Question Image")
+    st.subheader("Question File")
     uploaded_file = st.file_uploader(
-        "Upload a clear photo of the question paper",
-        type=["jpg", "jpeg", "png"],
-        help="Accepted formats: JPG, JPEG, PNG",
+        "Upload a clear photo or PDF of the question paper",
+        type=["jpg", "jpeg", "png", "pdf"],
+        help=f"Accepted formats: JPG, JPEG, PNG, PDF (max {MAX_FILE_MB} MB)",
     )
 
     submitted = st.form_submit_button("Submit", use_container_width=True)
@@ -74,12 +76,18 @@ if submitted:
         st.warning("Please fill in both Course Code and Faculty Initial.")
         st.stop()
     if not uploaded_file:
-        st.warning("Please upload an image before submitting.")
+        st.warning("Please upload an image or PDF before submitting.")
+        st.stop()
+    if uploaded_file.size > MAX_FILE_MB * 1024 * 1024:
+        st.warning(f"File is too large. Maximum size is {MAX_FILE_MB} MB.")
         st.stop()
 
+    file_type = "pdf" if uploaded_file.name.lower().endswith(".pdf") else "image"
+
     # ── Upload to Cloudinary ────────────────────────────────────────────
-    with st.spinner("Uploading image to Cloudinary…"):
+    with st.spinner(f"Uploading {file_type} to Cloudinary…"):
         try:
+            # PDFs are stored as 'image' resources so Cloudinary can render page previews.
             result = cloudinary.uploader.upload(
                 uploaded_file,
                 folder="question_bank",
@@ -87,11 +95,11 @@ if submitted:
             )
             image_url = result["secure_url"]
         except Exception as e:
-            st.error(f"Image upload failed: {e}")
+            st.error(f"Upload failed: {e}")
             st.stop()
 
     # ── Save to database ────────────────────────────────────────────────
-    add_question(department, course_code.strip().upper(), faculty_initial.strip().upper(), question_type, image_url)
+    add_question(department, course_code.strip().upper(), faculty_initial.strip().upper(), question_type, image_url, file_type)
 
     st.success("✅ Upload successful! Your question has been submitted and is now pending admin review.")
     st.balloons()

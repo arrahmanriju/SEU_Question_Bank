@@ -24,6 +24,7 @@ from db_manager import (
     DEPARTMENTS,
     QUESTION_TYPES
 )
+from ui_helpers import show_paper, type_label
 
 init_db()
 load_dotenv(override=True)
@@ -85,7 +86,7 @@ if st.sidebar.button("Logout", use_container_width=True):
 
 @st.dialog("Edit Question Details")
 def edit_question_dialog(q):
-    st.image(q["image_url"], use_container_width=True)
+    show_paper(q)
     
     with st.form(f"edit_form_{q['id']}"):
         col1, col2 = st.columns(2)
@@ -125,8 +126,8 @@ with tab1:
     else:
         for q in pending:
             with st.container(border=True):
-                st.image(q["image_url"], use_container_width=True)
-                st.markdown(f"**{q['course_code']}** · {q['question_type']}")
+                show_paper(q)
+                st.markdown(f"**{q['course_code']}** · {type_label(q)}")
                 st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']} · Uploaded {str(q['uploaded_at'])[:10]}")
 
                 col1, col2 = st.columns(2)
@@ -155,10 +156,10 @@ with tab2:
                 col_img, col_info, col_actions = st.columns([1, 2, 1])
                 
                 with col_img:
-                    st.image(q["image_url"], use_container_width=True)
+                    show_paper(q)
                 
                 with col_info:
-                    st.markdown(f"**{q['course_code']}** · {q['question_type']}")
+                    st.markdown(f"**{q['course_code']}** · {type_label(q)}")
                     st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']}")
                     st.caption(f"Uploaded {str(q['uploaded_at'])[:10]}")
                     
