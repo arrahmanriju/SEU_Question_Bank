@@ -23,7 +23,7 @@ from db_manager import (
     init_db,
 )
 from loader import loading
-from ui_helpers import show_paper, type_label
+from ui_helpers import show_paper, type_label, page_limit, load_more_button
 
 init_db()
 
@@ -101,14 +101,16 @@ if is_searching:
     if not results:
         st.info("No questions found matching your search.")
     else:
-        for q in results:
+        search_key = f"limit_search_{search_course.strip()}_{search_faculty.strip()}_{search_type}"
+        for q in results[:page_limit(search_key)]:
             with st.container(border=True):
                 show_paper(q)
                 st.markdown(f"**{q['course_code']}** · {type_label(q)}")
                 st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']} · Uploaded {str(q['uploaded_at'])[:10]}")
                 if st.button("🔍 Zoom Question", key=f"zoom_search_{q['id']}"):
                     zoom_question(q)
-    
+        load_more_button(search_key, len(results))
+
     st.stop()  # Stop rendering the rest of the page (hide drill-down)
 
 # ── Breadcrumb ──────────────────────────────────────────────────────────────
@@ -233,10 +235,12 @@ elif level == 4:
     else:
         st.subheader(f"{len(questions)} question(s) — {course} · {faculty}")
 
-        for q in questions:
+        questions_key = f"limit_q_{dept}_{course}_{faculty}"
+        for q in questions[:page_limit(questions_key)]:
             with st.container(border=True):
                 show_paper(q)
                 st.markdown(f"**{q['course_code']}** · {type_label(q)}")
                 st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']} · Uploaded {str(q['uploaded_at'])[:10]}")
                 if st.button("🔍 Zoom Question", key=f"zoom_q_{q['id']}"):
                     zoom_question(q)
+        load_more_button(questions_key, len(questions))

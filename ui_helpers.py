@@ -20,3 +20,28 @@ def show_paper(q: dict, width: int = 800) -> None:
 
 def type_label(q: dict) -> str:
     return f"{q['question_type']} · PDF" if is_pdf(q) else q["question_type"]
+
+
+PAGE_SIZE = 8
+
+
+def page_limit(key: str) -> int:
+    """How many items to show for a list (grows each time 'Load more' is clicked)."""
+    return st.session_state.get(key, PAGE_SIZE)
+
+
+def _show_more(key: str) -> None:
+    st.session_state[key] = page_limit(key) + PAGE_SIZE
+
+
+def load_more_button(key: str, total: int) -> None:
+    """Show a 'Load more' button if the list has more items than currently shown."""
+    remaining = total - page_limit(key)
+    if remaining > 0:
+        st.button(
+            f"⬇️ Load more ({remaining} remaining)",
+            key=f"{key}_more",
+            use_container_width=True,
+            on_click=_show_more,
+            args=(key,),
+        )

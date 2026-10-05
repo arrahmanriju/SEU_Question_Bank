@@ -13,7 +13,7 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
-from db_manager import init_db, count_by_status
+from db_manager import init_db, get_status_counts
 from loader import loading
 
 # ── Page configuration ──────────────────────────────────────────────────────
@@ -34,8 +34,9 @@ with loading("Loading…"):
 # ── Stats ───────────────────────────────────────────────────────────────────
 
 with loading("Loading stats…"):
-    approved = count_by_status("Approved")
-    pending = count_by_status("Pending")
+    counts = get_status_counts()
+    approved = counts.get("Approved", 0)
+    pending = counts.get("Pending", 0)
 total = approved + pending
 
 # ── Header ──────────────────────────────────────────────────────────────────

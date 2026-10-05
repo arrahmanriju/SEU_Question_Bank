@@ -25,7 +25,7 @@ from db_manager import (
     QUESTION_TYPES
 )
 from loader import loading
-from ui_helpers import show_paper, type_label
+from ui_helpers import show_paper, type_label, page_limit, load_more_button
 
 init_db()
 load_dotenv(override=True)
@@ -126,7 +126,7 @@ with tab1:
     if not pending:
         st.info("🎉 All clear! There are no pending questions to review.")
     else:
-        for q in pending:
+        for q in pending[:page_limit("limit_admin_pending")]:
             with st.container(border=True):
                 show_paper(q)
                 st.markdown(f"**{q['course_code']}** · {type_label(q)}")
@@ -145,6 +145,7 @@ with tab1:
                             reject_question(q["id"])
                         st.warning("Rejected and removed.")
                         st.rerun()
+        load_more_button("limit_admin_pending", len(pending))
 
 # ── Tab 2: Manage Approved Questions ────────────────────────────────────────
 
@@ -155,7 +156,7 @@ with tab2:
     if not approved:
         st.info("No approved questions yet.")
     else:
-        for q in approved:
+        for q in approved[:page_limit("limit_admin_approved")]:
             with st.container(border=True):
                 col_img, col_info, col_actions = st.columns([1, 2, 1])
                 
@@ -176,4 +177,4 @@ with tab2:
                             delete_question(q["id"])
                         st.success("Question deleted.")
                         st.rerun()
-
+        load_more_button("limit_admin_approved", len(approved))

@@ -20,6 +20,9 @@ except ImportError:
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "question_bank.db")
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
+# Reads are cached this long; every write calls st.cache_data.clear(), so data stays fresh.
+CACHE_TTL = 300
+
 def get_optimized_image_url(url: str, width: int = 800) -> str:
     """Insert Cloudinary transformations for auto-format, auto-quality, and resizing."""
     if "res.cloudinary.com" in url and "/upload/" in url:
@@ -51,7 +54,7 @@ def get_preview_url(q: dict, width: int = 800) -> str:
         if tail.lower().endswith(".pdf"):
             tail = tail[:-4]
         return f"{head}/upload/pg_1,w_{width},q_auto,f_jpg/{tail}.jpg"
-    return url
+    return get_optimized_image_url(url, width)
 
 
 
@@ -233,7 +236,7 @@ def add_question(
         _release_connection(conn)
 
 
-@st.cache_data(ttl=60, show_spinner=False)
+@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
 def get_questions(
     status: str | None = None,
     department: str | None = None,
@@ -268,7 +271,7 @@ def get_questions(
     return _execute(query, tuple(params), fetchall=True)
 
 
-@st.cache_data(ttl=60, show_spinner=False)
+@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
 def search_questions(course_query: str, faculty_query: str, question_type: str | None = None) -> list[dict]:
     """Search approved questions by partial course code / faculty initial and exact question type."""
     query = "SELECT * FROM questions WHERE status = 'Approved'"
@@ -290,7 +293,7 @@ def search_questions(course_query: str, faculty_query: str, question_type: str |
     return _execute(query, tuple(params), fetchall=True)
 
 
-@st.cache_data(ttl=60, show_spinner=False)
+@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
 def get_departments() -> list[dict]:
     """
     Return distinct departments that have at least one approved question,
@@ -306,7 +309,7 @@ def get_departments() -> list[dict]:
     return _execute(query, fetchall=True)
 
 
-@st.cache_data(ttl=60, show_spinner=False)
+@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
 def get_courses(department: str) -> list[dict]:
     """
     Return distinct course codes for a given department (approved only),
@@ -322,7 +325,7 @@ def get_courses(department: str) -> list[dict]:
     return _execute(query, (department,), fetchall=True)
 
 
-@st.cache_data(ttl=60, show_spinner=False)
+@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
 def get_faculty(department: str, course_code: str) -> list[dict]:
     """
     Return distinct faculty initials for a given department + course combo
@@ -366,7 +369,14 @@ def update_question(question_id: int, department: str, course_code: str, faculty
     _execute(query, (department, course_code, faculty_initial, question_type, question_id), commit=True)
     st.cache_data.clear()
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=CACHE_TTL)
+def get_status_counts() -> dict:
+    """Return {status: count} for all questions in a single query."""
+    rows = _execute("SELECT status, COUNT(*) AS count FROM questions GROUP BY status;", fetchall=True)
+    return {r["status"]: r["count"] for r in rows}
+
+
+@st.cache_data(ttl=CACHE_TTL)
 def count_by_status(status: str) -> int:
     """Return the count of questions with the given status."""
     conn = _get_connection()
