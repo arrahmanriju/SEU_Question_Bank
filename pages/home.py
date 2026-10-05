@@ -14,6 +14,7 @@ if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
 from db_manager import init_db, count_by_status
+from loader import loading
 
 # ── Page configuration ──────────────────────────────────────────────────────
 
@@ -26,12 +27,15 @@ st.set_page_config(
 
 # ── Initialise database on first run ────────────────────────────────────────
 
-init_db()
+with loading("Loading…"):
+    init_db()
+
 
 # ── Stats ───────────────────────────────────────────────────────────────────
 
-approved = count_by_status("Approved")
-pending = count_by_status("Pending")
+with loading("Loading stats…"):
+    approved = count_by_status("Approved")
+    pending = count_by_status("Pending")
 total = approved + pending
 
 # ── Header ──────────────────────────────────────────────────────────────────

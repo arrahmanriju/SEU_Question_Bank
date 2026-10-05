@@ -24,6 +24,7 @@ from db_manager import (
     DEPARTMENTS,
     QUESTION_TYPES
 )
+from loader import loading
 from ui_helpers import show_paper, type_label
 
 init_db()
@@ -105,7 +106,8 @@ def edit_question_dialog(q):
             if not new_course.strip() or not new_faculty.strip():
                 st.error("Course Code and Faculty Initial cannot be empty.")
             else:
-                update_question(q["id"], new_dept, new_course.strip().upper(), new_faculty.strip().upper(), new_type)
+                with loading("Saving changes…"):
+                    update_question(q["id"], new_dept, new_course.strip().upper(), new_faculty.strip().upper(), new_type)
                 st.success("Question updated successfully!")
                 st.rerun()
 
@@ -133,12 +135,14 @@ with tab1:
                 col1, col2 = st.columns(2)
                 with col1:
                     if st.button("✅ Approve", key=f"approve_{q['id']}", use_container_width=True):
-                        approve_question(q["id"])
+                        with loading("Approving…"):
+                            approve_question(q["id"])
                         st.success("Approved!")
                         st.rerun()
                 with col2:
                     if st.button("❌ Reject", key=f"reject_{q['id']}", use_container_width=True):
-                        reject_question(q["id"])
+                        with loading("Rejecting…"):
+                            reject_question(q["id"])
                         st.warning("Rejected and removed.")
                         st.rerun()
 
@@ -168,7 +172,8 @@ with tab2:
                         edit_question_dialog(q)
                     
                     if st.button("🗑️ Delete", key=f"delete_btn_{q['id']}", type="primary", use_container_width=True):
-                        delete_question(q["id"])
+                        with loading("Deleting…"):
+                            delete_question(q["id"])
                         st.success("Question deleted.")
                         st.rerun()
 

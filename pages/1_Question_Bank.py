@@ -22,6 +22,7 @@ from db_manager import (
     QUESTION_TYPES,
     init_db,
 )
+from loader import loading
 from ui_helpers import show_paper, type_label
 
 init_db()
@@ -93,7 +94,8 @@ is_searching = bool(search_course.strip() or search_faculty.strip() or search_ty
 
 if is_searching:
     st.divider()
-    results = search_questions(search_course.strip(), search_faculty.strip(), search_type)
+    with loading("Searching papers…"):
+        results = search_questions(search_course.strip(), search_faculty.strip(), search_type)
     st.subheader(f"Search Results ({len(results)})")
     
     if not results:
@@ -146,7 +148,8 @@ st.divider()
 # ═════════════════════════════════════════════════════════════════════════════
 
 if level == 1:
-    departments = get_departments()
+    with loading("Loading departments…"):
+        departments = get_departments()
 
     if not departments:
         st.info("No departments yet. No approved questions have been uploaded.")
@@ -169,7 +172,8 @@ if level == 1:
 # ═════════════════════════════════════════════════════════════════════════════
 
 elif level == 2:
-    courses = get_courses(dept)
+    with loading("Loading courses…"):
+        courses = get_courses(dept)
 
     if not courses:
         st.info("No courses found for this department yet.")
@@ -192,7 +196,8 @@ elif level == 2:
 # ═════════════════════════════════════════════════════════════════════════════
 
 elif level == 3:
-    faculty_list = get_faculty(dept, course)
+    with loading("Loading faculty…"):
+        faculty_list = get_faculty(dept, course)
 
     if not faculty_list:
         st.info("No faculty found for this course yet.")
@@ -215,12 +220,13 @@ elif level == 3:
 # ═════════════════════════════════════════════════════════════════════════════
 
 elif level == 4:
-    questions = get_questions(
-        status="Approved",
-        department=dept,
-        course_code=course,
-        faculty_initial=faculty,
-    )
+    with loading("Loading question papers…"):
+        questions = get_questions(
+            status="Approved",
+            department=dept,
+            course_code=course,
+            faculty_initial=faculty,
+        )
 
     if not questions:
         st.info("No approved questions from this faculty yet.")

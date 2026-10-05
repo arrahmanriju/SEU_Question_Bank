@@ -14,6 +14,7 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
+from loader import loading
 from db_manager import add_question, DEPARTMENTS, QUESTION_TYPES, init_db
 
 init_db()
@@ -85,7 +86,7 @@ if submitted:
     file_type = "pdf" if uploaded_file.name.lower().endswith(".pdf") else "image"
 
     # ── Upload to Cloudinary ────────────────────────────────────────────
-    with st.spinner(f"Uploading {file_type} to Cloudinary…"):
+    with loading(f"Uploading your {file_type}…"):
         try:
             # PDFs are stored as 'image' resources so Cloudinary can render page previews.
             result = cloudinary.uploader.upload(
@@ -99,7 +100,8 @@ if submitted:
             st.stop()
 
     # ── Save to database ────────────────────────────────────────────────
-    add_question(department, course_code.strip().upper(), faculty_initial.strip().upper(), question_type, image_url, file_type)
+    with loading("Saving…"):
+        add_question(department, course_code.strip().upper(), faculty_initial.strip().upper(), question_type, image_url, file_type)
 
     st.success("✅ Upload successful! Your question has been submitted and is now pending admin review.")
     st.balloons()
