@@ -19,6 +19,7 @@ from db_manager import (
     get_faculty,
     get_questions,
     search_questions,
+    QUESTION_TYPES,
     init_db,
 )
 from ui_helpers import show_paper, type_label
@@ -80,11 +81,19 @@ with col_s1:
 with col_s2:
     search_faculty = st.text_input("Search Faculty Initial", placeholder="e.g. ABC", key="search_faculty")
 
-is_searching = bool(search_course.strip() or search_faculty.strip())
+search_type = st.pills(
+    "Question Type",
+    options=QUESTION_TYPES,
+    selection_mode="single",
+    key="search_type",
+    help="Pick a type to filter. Leave empty to show all types.",
+)
+
+is_searching = bool(search_course.strip() or search_faculty.strip() or search_type)
 
 if is_searching:
     st.divider()
-    results = search_questions(search_course.strip(), search_faculty.strip())
+    results = search_questions(search_course.strip(), search_faculty.strip(), search_type)
     st.subheader(f"Search Results ({len(results)})")
     
     if not results:

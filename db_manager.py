@@ -269,8 +269,8 @@ def get_questions(
 
 
 @st.cache_data(ttl=60, show_spinner=False)
-def search_questions(course_query: str, faculty_query: str) -> list[dict]:
-    """Search approved questions by partial course code or faculty initial."""
+def search_questions(course_query: str, faculty_query: str, question_type: str | None = None) -> list[dict]:
+    """Search approved questions by partial course code / faculty initial and exact question type."""
     query = "SELECT * FROM questions WHERE status = 'Approved'"
     params = []
     
@@ -282,7 +282,10 @@ def search_questions(course_query: str, faculty_query: str) -> list[dict]:
     if faculty_query:
         query += f" AND faculty_initial {op} ?"
         params.append(f"%{faculty_query}%")
-        
+    if question_type:
+        query += " AND question_type = ?"
+        params.append(question_type)
+
     query += " ORDER BY uploaded_at DESC"
     return _execute(query, tuple(params), fetchall=True)
 
