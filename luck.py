@@ -33,6 +33,15 @@ BAD = [
 ]
 
 
+def _mood(luck: int) -> tuple[str, str, str]:
+    """(css color, streamlit color name, face) — red and sad below 50%."""
+    if luck < 50:
+        return "#e5484d", "red", "😭"
+    if luck < 67:
+        return "#f5a524", "orange", "😐"
+    return "#30a46c", "green", "😄"
+
+
 def _roll() -> None:
     with loading("Reading your fate…"):
         time.sleep(2)
@@ -52,9 +61,16 @@ def exam_luck_game(show_study_link: bool = True) -> None:
         return
 
     luck = st.session_state.luck
-    st.metric("Your luck today", f"{luck}%")
-    st.progress(luck / 100)
-    st.subheader(st.session_state.luck_msg)
+    color, name, face = _mood(luck)
+    st.markdown(
+        f"<div style='text-align:center'>"
+        f"<div style='opacity:.6;font-size:.85rem'>Your luck today</div>"
+        f"<div style='font-size:3.2rem;font-weight:700;color:{color};line-height:1.1'>{face} {luck}%</div>"
+        f"<div style='height:12px;border-radius:6px;background:rgba(128,128,128,.25);margin:.6rem 0 1rem'>"
+        f"<div style='height:100%;width:{luck}%;border-radius:6px;background:{color}'></div></div></div>",
+        unsafe_allow_html=True,
+    )
+    st.subheader(f":{name}[{st.session_state.luck_msg}]")
     if rolled and luck >= 67:
         st.balloons()
     elif rolled and luck < 34:
