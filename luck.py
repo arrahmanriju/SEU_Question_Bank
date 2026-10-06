@@ -22,6 +22,14 @@ OKAY = [
     "You will remember the answer right after the exam 😅",
     "A pen will run out of ink, but you'll have a spare 🖊️",
     "Average luck. Revise one more chapter 📖",
+    "You'll know exactly 2 answers, and both will be the wrong question 🫠",
+    "Half the paper is easy, the other half is written in alien language 👽",
+    "You'll finish early, then spend 20 minutes regretting every answer 🕰️",
+    "Your friend sitting next to you knows nothing either. No help today 🤝",
+    "The easy questions are worth 2 marks. The hard ones are worth your soul 😮‍💨",
+    "You'll write 6 pages of confidence. The teacher will give 6 marks of pity 📝",
+    "Pass mark? Close. Dignity? Missing 🚶",
+    "You'll solve it perfectly... right after you leave the hall 🚪",
 ]
 BAD = [
     "The hardest chapter is the one you skipped. Enjoy failing it 💀",
