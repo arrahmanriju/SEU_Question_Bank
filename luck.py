@@ -64,7 +64,7 @@ def exam_luck_game(show_study_link: bool = True) -> None:
     color, name, face = _mood(luck)
     st.markdown(
         f"<div style='text-align:center'>"
-        f"<div style='opacity:.6;font-size:.85rem'>Your luck today</div>"
+        f"<div style='opacity:.6;font-size:.85rem'>Luck of your next exam</div>"
         f"<div style='font-size:3.2rem;font-weight:700;color:{color};line-height:1.1'>{face} {luck}%</div>"
         f"<div style='height:12px;border-radius:6px;background:rgba(128,128,128,.25);margin:.6rem 0 1rem'>"
         f"<div style='height:100%;width:{luck}%;border-radius:6px;background:{color}'></div></div></div>",
