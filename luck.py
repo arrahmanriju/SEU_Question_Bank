@@ -37,7 +37,7 @@ def _roll() -> None:
 
 def exam_luck_game(show_study_link: bool = True) -> None:
     """Render the game: one button, a random luck %, and a funny message."""
-    st.button("🎲 Check my luck", on_click=_roll, use_container_width=True, type="primary")
+    st.button("🎲 Check your luck", on_click=_roll, use_container_width=True, type="primary")
 
     if "luck" not in st.session_state:
         return
