@@ -15,6 +15,7 @@ if root_dir not in sys.path:
 
 from db_manager import init_db, get_status_counts
 from loader import loading
+from luck import exam_luck_game
 
 # ── Page configuration ──────────────────────────────────────────────────────
 
@@ -65,3 +66,10 @@ Use the **sidebar** to navigate:
 - **🔒 Admin** — Review pending uploads
 """
 )
+
+# ── Fun corner ──────────────────────────────────────────────────────────────
+
+st.divider()
+st.subheader("🎲 Exam Luck Today")
+st.caption("One tap. No thinking. Let's see how lucky you are!")
+exam_luck_game(show_study_link=False)
