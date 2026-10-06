@@ -61,6 +61,7 @@ Use the **sidebar** to navigate:
 
 - **📚 Question Bank** — Browse approved exam papers
 - **📤 Upload** — Submit a new question paper
+- **🎲 Exam Luck** — Feeling lucky? Check your exam luck today
 - **🔒 Admin** — Review pending uploads
 """
 )
