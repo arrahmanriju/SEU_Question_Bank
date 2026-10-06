@@ -44,28 +44,23 @@ total = approved + pending
 st.title("🎓 SEU Question Bank")
 st.caption("A centralized platform for students to share and access previous exam question papers.")
 
-# ── Main actions ────────────────────────────────────────────────────────────
-
-btn1, btn2 = st.columns(2)
-with btn1:
-    st.page_link("pages/1_Question_Bank.py", label="Find papers", icon="📚", use_container_width=True)
-with btn2:
-    st.page_link("pages/2_Upload.py", label="Upload a paper", icon="📤", use_container_width=True)
-
 # ── Stats cards ─────────────────────────────────────────────────────────────
 
-col1, col2 = st.columns(2)
-col1.metric("Papers available", approved)
-col2.metric("Waiting for review", pending)
+col1, col2, col3 = st.columns(3)
+col1.metric("Total Questions", total)
+col2.metric("Approved", approved)
+col3.metric("Pending Review", pending)
 
 # ── Quick guide ─────────────────────────────────────────────────────────────
 
 st.divider()
-st.subheader("How it works")
+st.subheader("Get Started")
 st.markdown(
     """
-1. **Find** — open the Question Bank, browse by department or search by course code.
-2. **Share** — got an old paper? Upload a photo or PDF in under a minute. No login needed.
-3. **Reviewed** — an admin checks every upload before it goes public.
+Use the **sidebar** to navigate:
+
+- **📚 Question Bank** — Browse approved exam papers
+- **📤 Upload** — Submit a new question paper
+- **🔒 Admin** — Review pending uploads
 """
 )

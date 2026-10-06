@@ -75,19 +75,6 @@ DEPARTMENTS = [
 
 QUESTION_TYPES = ["CT", "Mid", "Final", "Others"]
 
-SEASONS = ["Spring", "Summer", "Fall"]
-
-
-def semester_options(years_back: int = 8) -> list[str]:
-    """Semester choices like 'Spring 2026', newest first."""
-    this_year = datetime.now().year
-    return [f"{season} {y}" for y in range(this_year, this_year - years_back, -1) for season in reversed(SEASONS)]
-
-
-def normalize_course_code(code: str) -> str:
-    """'cse 101' / 'CSE-101' -> 'CSE101' so the same course isn't split into several folders."""
-    return re.sub(r"[^A-Za-z0-9]", "", code).upper()
-
 
 # ── Database helpers ────────────────────────────────────────────────────────
 
@@ -197,14 +184,10 @@ def init_db() -> None:
         # Migration: add file_type without touching existing rows (they default to 'image').
         if _is_postgres():
             cursor.execute("ALTER TABLE questions ADD COLUMN IF NOT EXISTS file_type TEXT NOT NULL DEFAULT 'image';")
-            cursor.execute("ALTER TABLE questions ADD COLUMN IF NOT EXISTS semester TEXT NOT NULL DEFAULT '';")
         else:
             cursor.execute("PRAGMA table_info(questions);")
             if "file_type" not in [row[1] for row in cursor.fetchall()]:
                 cursor.execute("ALTER TABLE questions ADD COLUMN file_type TEXT NOT NULL DEFAULT 'image';")
-            cursor.execute("PRAGMA table_info(questions);")
-            if "semester" not in [row[1] for row in cursor.fetchall()]:
-                cursor.execute("ALTER TABLE questions ADD COLUMN semester TEXT NOT NULL DEFAULT '';")
         conn.commit()
     finally:
         _release_connection(conn)
@@ -217,7 +200,6 @@ def add_question(
     question_type: str,
     image_url: str,
     file_type: str = "image",
-    semester: str = "",
 ) -> int:
     """
     Insert a new question with status 'Pending'.
@@ -229,10 +211,10 @@ def add_question(
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO questions (department, course_code, faculty_initial, question_type, image_url, file_type, semester, status, uploaded_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, 'Pending', %s) RETURNING id;
+                INSERT INTO questions (department, course_code, faculty_initial, question_type, image_url, file_type, status, uploaded_at)
+                VALUES (%s, %s, %s, %s, %s, %s, 'Pending', %s) RETURNING id;
                 """,
-                (department, course_code, faculty_initial, question_type, image_url, file_type, semester, datetime.now().isoformat())
+                (department, course_code, faculty_initial, question_type, image_url, file_type, datetime.now().isoformat())
             )
             row_id = cursor.fetchone()[0]
             conn.commit()
@@ -242,10 +224,10 @@ def add_question(
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO questions (department, course_code, faculty_initial, question_type, image_url, file_type, semester, status, uploaded_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending', ?);
+                INSERT INTO questions (department, course_code, faculty_initial, question_type, image_url, file_type, status, uploaded_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'Pending', ?);
                 """,
-                (department, course_code, faculty_initial, question_type, image_url, file_type, semester, datetime.now().isoformat())
+                (department, course_code, faculty_initial, question_type, image_url, file_type, datetime.now().isoformat())
             )
             conn.commit()
             st.cache_data.clear()
@@ -290,7 +272,7 @@ def get_questions(
 
 
 @st.cache_data(ttl=CACHE_TTL, show_spinner=False)
-def search_questions(course_query: str, faculty_query: str, question_type: str | None = None, semester: str | None = None) -> list[dict]:
+def search_questions(course_query: str, faculty_query: str, question_type: str | None = None) -> list[dict]:
     """Search approved questions by partial course code / faculty initial and exact question type."""
     query = "SELECT * FROM questions WHERE status = 'Approved'"
     params = []
@@ -306,19 +288,9 @@ def search_questions(course_query: str, faculty_query: str, question_type: str |
     if question_type:
         query += " AND question_type = ?"
         params.append(question_type)
-    if semester:
-        query += " AND semester = ?"
-        params.append(semester)
 
     query += " ORDER BY uploaded_at DESC"
     return _execute(query, tuple(params), fetchall=True)
-
-
-@st.cache_data(ttl=CACHE_TTL, show_spinner=False)
-def get_semesters() -> list[str]:
-    """Distinct semesters that have approved papers (blank/legacy ones excluded)."""
-    rows = _execute("SELECT DISTINCT semester FROM questions WHERE status = 'Approved' AND semester <> '';", fetchall=True)
-    return [r["semester"] for r in rows]
 
 
 @st.cache_data(ttl=CACHE_TTL, show_spinner=False)

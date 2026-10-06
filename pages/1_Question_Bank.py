@@ -19,8 +19,6 @@ from db_manager import (
     get_faculty,
     get_questions,
     search_questions,
-    get_semesters,
-    normalize_course_code,
     QUESTION_TYPES,
     init_db,
 )
@@ -92,29 +90,23 @@ search_type = st.pills(
     help="Pick a type to filter. Leave empty to show all types.",
 )
 
-semesters = get_semesters()
-search_semester = None
-if semesters:
-    search_semester = st.selectbox("Semester", options=semesters, index=None, placeholder="All semesters", key="search_semester")
-
-is_searching = bool(search_course.strip() or search_faculty.strip() or search_type or search_semester)
+is_searching = bool(search_course.strip() or search_faculty.strip() or search_type)
 
 if is_searching:
     st.divider()
     with loading("Searching papers…"):
-        results = search_questions(normalize_course_code(search_course), search_faculty.strip(), search_type, search_semester)
+        results = search_questions(search_course.strip(), search_faculty.strip(), search_type)
     st.subheader(f"Search Results ({len(results)})")
     
     if not results:
-        st.info("No questions found matching your search. Have one? Help others by uploading it!")
-        st.page_link("pages/2_Upload.py", label="📤 Upload a question paper")
+        st.info("No questions found matching your search.")
     else:
-        search_key = f"limit_search_{search_course.strip()}_{search_faculty.strip()}_{search_type}_{search_semester}"
+        search_key = f"limit_search_{search_course.strip()}_{search_faculty.strip()}_{search_type}"
         for q in results[:page_limit(search_key)]:
             with st.container(border=True):
                 show_paper(q)
                 st.markdown(f"**{q['course_code']}** · {type_label(q)}")
-                st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']}{' · ' + q['semester'] if q.get('semester') else ''} · Uploaded {str(q['uploaded_at'])[:10]}")
+                st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']} · Uploaded {str(q['uploaded_at'])[:10]}")
                 if st.button("🔍 Zoom Question", key=f"zoom_search_{q['id']}"):
                     zoom_question(q)
         load_more_button(search_key, len(results))
@@ -162,8 +154,7 @@ if level == 1:
         departments = get_departments()
 
     if not departments:
-        st.info("No papers yet. Be the first to upload one!")
-        st.page_link("pages/2_Upload.py", label="📤 Upload a question paper")
+        st.info("No departments yet. No approved questions have been uploaded.")
     else:
         st.subheader(f"{len(departments)} department(s)")
 
@@ -249,7 +240,7 @@ elif level == 4:
             with st.container(border=True):
                 show_paper(q)
                 st.markdown(f"**{q['course_code']}** · {type_label(q)}")
-                st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']}{' · ' + q['semester'] if q.get('semester') else ''} · Uploaded {str(q['uploaded_at'])[:10]}")
+                st.caption(f"{q['department']} Dept · Faculty: {q['faculty_initial']} · Uploaded {str(q['uploaded_at'])[:10]}")
                 if st.button("🔍 Zoom Question", key=f"zoom_q_{q['id']}"):
                     zoom_question(q)
         load_more_button(questions_key, len(questions))
