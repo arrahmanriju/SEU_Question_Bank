@@ -1,5 +1,5 @@
 """
-luck.py — the "Exam Luck Today" one-tap game, shared by the Home and Exam Luck pages.
+luck.py — the "Exam Luck" one-tap game, shared by the Home and Exam Luck pages.
 """
 
 import random

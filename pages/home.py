@@ -69,6 +69,6 @@ Use the **sidebar** to navigate:
 # ── Fun corner ──────────────────────────────────────────────────────────────
 
 st.divider()
-st.subheader("🎲 Exam Luck Today")
+st.subheader("Exam Luck")
 st.caption("One tap. No thinking. Let's see how lucky you are!")
 exam_luck_game(show_study_link=False)
