@@ -16,6 +16,12 @@ GOOD = [
     "Every question comes from the past papers 📚",
     "Free marks on the first question 🎁",
     "The strict invigilator is on leave 😎",
+    "You'll guess every MCQ right and have no idea why 🎯",
+    "The teacher gives a 'hint' that is literally the answer 🤫",
+    "You studied one chapter and the whole paper is from it 🙏",
+    "You'll finish early and still get full marks. Suspicious 🤨",
+    "Your handwriting is finally readable. The teacher gives you extra marks 🖋️",
+    "The invigilator is asleep. Nobody is judging today 😴",
 ]
 OKAY = [
     "Half the paper is easy, half is a mystery 🤔",
@@ -30,6 +36,10 @@ OKAY = [
     "You'll write 6 pages of confidence. The teacher will give 6 marks of pity 📝",
     "Pass mark? Close. Dignity? Missing 🚶",
     "You'll solve it perfectly... right after you leave the hall 🚪",
+    "You'll answer with 100% confidence and 40% accuracy 😎",
+    "The paper is fair. Your preparation is not 🫥",
+    "You'll pass, then lie to everyone about how hard it was 🎭",
+    "Three questions you know, three you fake, one you pray for 🙏",
 ]
 BAD = [
     "The hardest chapter is the one you skipped. Enjoy failing it 💀",
@@ -38,6 +48,13 @@ BAD = [
     "The question you ignored for 3 months is Question 1 🪦",
     "Everyone around you knows the answers. You know the room number 😶",
     "Surprise quiz today. Your 'I'll study tomorrow' era is over ☠️",
+    "You'll stare at Question 1 so long it starts staring back 👁️",
+    "Your brain goes blank, and so does the answer sheet 📄",
+    "The teacher's mercy ended last semester 🪦",
+    "You'll write 'Sir, I know this' in the answer sheet. Sir does not care 😭",
+    "Everything you memorized last night is gone. Only the stress remains 🧠",
+    "The paper is easy. You still won't make it 🫡",
+    "Retake season is calling your name 📞",
 ]
 
 
