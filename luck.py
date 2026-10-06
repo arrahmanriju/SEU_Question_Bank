@@ -3,8 +3,11 @@ luck.py — the "Exam Luck Today" one-tap game, shared by the Home and Exam Luck
 """
 
 import random
+import time
 
 import streamlit as st
+
+from loader import loading
 
 GOOD = [
     "Your Final will be super easy 🍀",
@@ -21,14 +24,18 @@ OKAY = [
     "Average luck. Revise one more chapter 📖",
 ]
 BAD = [
-    "Surprise quiz incoming 😬",
-    "Teacher says: 'Open book? No.' 😶",
-    "Your calculator battery dies mid-exam 🔋",
-    "The hardest chapter is your weakest one 💀",
+    "The hardest chapter is the one you skipped. Enjoy failing it 💀",
+    "You studied everything except what's coming. Congrats 😬",
+    "Your calculator dies mid-exam, and so does your CGPA 🔋",
+    "The question you ignored for 3 months is Question 1 🪦",
+    "Everyone around you knows the answers. You know the room number 😶",
+    "Surprise quiz today. Your 'I'll study tomorrow' era is over ☠️",
 ]
 
 
 def _roll() -> None:
+    with loading("Reading your fate…"):
+        time.sleep(2)
     luck = random.randint(1, 100)
     pool = GOOD if luck >= 67 else OKAY if luck >= 34 else BAD
     st.session_state.luck = luck
@@ -37,7 +44,9 @@ def _roll() -> None:
 
 def exam_luck_game(show_study_link: bool = True) -> None:
     """Render the game: one button, a random luck %, and a funny message."""
-    st.button("🎲 Check your luck", on_click=_roll, use_container_width=True, type="primary")
+    rolled = st.button("🎲 Check your luck", use_container_width=True, type="primary")
+    if rolled:
+        _roll()
 
     if "luck" not in st.session_state:
         return
@@ -46,9 +55,9 @@ def exam_luck_game(show_study_link: bool = True) -> None:
     st.metric("Your luck today", f"{luck}%")
     st.progress(luck / 100)
     st.subheader(st.session_state.luck_msg)
-    if luck >= 67:
+    if rolled and luck >= 67:
         st.balloons()
-    elif luck < 34:
+    elif rolled and luck < 34:
         st.snow()
     st.caption("Screenshot it and share with your friends 📸")
     if show_study_link:
